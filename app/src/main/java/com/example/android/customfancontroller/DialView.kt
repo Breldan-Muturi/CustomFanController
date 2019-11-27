@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.withStyledAttributes
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
@@ -39,9 +40,17 @@ class DialView @JvmOverloads constructor(
     textSize = 55.0f
     typeface = Typeface.create("", Typeface.BOLD)
   }
+  private var fanSpeedLowColor = 0
+  private var fanSpeedMediumColor = 0
+  private var fanSeedMaxColor = 0
 
   init {
       isClickable = true
+    context.withStyledAttributes(attrs, R.styleable.DialView){
+      fanSpeedLowColor = getColor(R.styleable.DialView_fanColor1, 0)
+      fanSpeedMediumColor = getColor(R.styleable.DialView_fanColor2, 0)
+      fanSeedMaxColor = getColor(R.styleable.DialView_fanColor3, 0)
+    }
   }
 
   override fun performClick(): Boolean {
@@ -65,7 +74,12 @@ class DialView @JvmOverloads constructor(
   override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)
     //set background color to green if selection not off
-    paint .color = if (fanSpeed == FanSpeed.OFF) Color.GRAY else Color.GREEN
+    paint .color = when (fanSpeed){
+      FanSpeed.OFF -> Color.GRAY
+      FanSpeed.LOW -> fanSpeedLowColor
+      FanSpeed.MEDIUM -> fanSpeedMediumColor
+      FanSpeed.HIGH -> fanSeedMaxColor
+    }
     canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), radius, paint)
     //draw the indicator circle
     val markerRadius = radius + RADIUS_OFFSET_INDICATOR
